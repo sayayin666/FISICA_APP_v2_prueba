@@ -1,5 +1,6 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+from users.api.router import router_user
 
 from django.urls import re_path
 from rest_framework import permissions
@@ -26,4 +27,5 @@ urlpatterns = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
     path('admin/', admin.site.urls),
+    path('api/', include(router_user.urls)),
 ]
