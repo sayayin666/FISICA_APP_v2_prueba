@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from users.api.serializer import UserSerializer
 from users.models import User
 from django.contrib.auth.hashers import make_password
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 class UserApiViewSet(ModelViewSet):
     permission_classes = [IsAdminUser]
@@ -20,3 +22,19 @@ class UserApiViewSet(ModelViewSet):
             request.data['password'] = make_password(request.data['password'])
         
         return super().partial_update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        copia_password = request.data.get['password']
+        
+        if copia_password:
+            request.data['password'] = make_password(copia_password)
+        else:
+            request.data['password'] = request.user.password
+            return super().update(request, *args, **kwargs)
+        
+class UserView(APIView):
+    permission_class = [IsAuthenticated]
+    
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
